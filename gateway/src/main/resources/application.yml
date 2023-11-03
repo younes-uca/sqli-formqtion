@@ -1,0 +1,35 @@
+spring:
+  application:
+    name: gateway
+  cloud:
+    gateway:
+      routes:
+        - id: order-ms
+          uri: http://localhost:8036/api/admin/orderStatus/
+          predicates:
+            - Path=/api/admin/orderStatus/**
+          filters:
+            - name: RequestRateLimiter
+              args:
+                key-resolver: "#{@userKeyResolver}"
+                redis-rate-limiter.replenishRate: 1
+                redis-rate-limiter.burstCapacity: 2
+  data:
+    redis:
+      host: 127.0.0.1
+      port: 6379
+      password:
+server:
+  port: 8080
+logging:
+  level:
+    reactor:
+      netty:
+        http:
+        server:
+        HttpServer: DEBUG
+    org:
+      springframework:
+        cloud:
+          gateway:
+            rate-limit: DEBUG
